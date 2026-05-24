@@ -179,6 +179,55 @@ Open:
 http://127.0.0.1:3000
 ```
 
+## Vercel Deployment
+
+The repository is ready for Vercel deployment.
+
+Use these Vercel settings:
+
+- Framework preset: `Next.js`
+- Install command: `npm install`
+- Build command: `npm run build`
+- Output directory: leave default
+
+Add these environment variables in Vercel for Production, Preview, and Development:
+
+```env
+DATABASE_URL="postgresql://..."
+DIRECT_URL="postgresql://..."
+UPSTASH_REDIS_REST_URL="..."
+UPSTASH_REDIS_REST_TOKEN="..."
+CRON_SECRET="replace-with-a-long-random-secret"
+```
+
+For Neon:
+
+- `DATABASE_URL` should use the pooled host for app runtime.
+- `DIRECT_URL` should use the direct host for Prisma schema operations.
+- Use `sslmode=require`.
+- Remove `channel_binding=require` if Prisma schema commands fail.
+
+The `postinstall` script runs `prisma generate`, so Vercel builds have a generated Prisma Client before `next build`.
+
+Database schema setup is not run automatically during Vercel deploys. Run this once from your local machine or CI before production traffic:
+
+```bash
+npx prisma db push
+```
+
+Optional seed data:
+
+```bash
+npm run prisma:seed
+```
+
+After deployment, configure a Vercel Cron Job or external scheduler to call:
+
+```text
+POST https://your-vercel-domain.vercel.app/api/cron/cleanup-reservations
+Authorization: Bearer $CRON_SECRET
+```
+
 ## Verification
 
 The following checks were run successfully:
