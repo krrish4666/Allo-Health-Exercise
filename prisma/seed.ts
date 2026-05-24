@@ -3,9 +3,14 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
+  await prisma.reservation.deleteMany();
+
   const east = await prisma.warehouse.upsert({
     where: { id: "wh_east" },
-    update: {},
+    update: {
+      name: "East Fulfillment",
+      location: "Newark, NJ"
+    },
     create: {
       id: "wh_east",
       name: "East Fulfillment",
@@ -15,7 +20,10 @@ async function main() {
 
   const west = await prisma.warehouse.upsert({
     where: { id: "wh_west" },
-    update: {},
+    update: {
+      name: "West Fulfillment",
+      location: "Reno, NV"
+    },
     create: {
       id: "wh_west",
       name: "West Fulfillment",
@@ -25,7 +33,10 @@ async function main() {
 
   const keyboard = await prisma.product.upsert({
     where: { sku: "KEY-MX-001" },
-    update: {},
+    update: {
+      name: "Mechanical Keyboard",
+      price: "149.00"
+    },
     create: {
       name: "Mechanical Keyboard",
       sku: "KEY-MX-001",
@@ -35,7 +46,10 @@ async function main() {
 
   const monitor = await prisma.product.upsert({
     where: { sku: "MON-4K-027" },
-    update: {},
+    update: {
+      name: "27-inch 4K Monitor",
+      price: "399.00"
+    },
     create: {
       name: "27-inch 4K Monitor",
       sku: "MON-4K-027",
@@ -45,7 +59,10 @@ async function main() {
 
   await prisma.stock.upsert({
     where: { productId_warehouseId: { productId: keyboard.id, warehouseId: east.id } },
-    update: {},
+    update: {
+      totalUnits: 4,
+      reservedUnits: 0
+    },
     create: {
       productId: keyboard.id,
       warehouseId: east.id,
@@ -55,7 +72,10 @@ async function main() {
 
   await prisma.stock.upsert({
     where: { productId_warehouseId: { productId: keyboard.id, warehouseId: west.id } },
-    update: {},
+    update: {
+      totalUnits: 1,
+      reservedUnits: 0
+    },
     create: {
       productId: keyboard.id,
       warehouseId: west.id,
@@ -65,7 +85,10 @@ async function main() {
 
   await prisma.stock.upsert({
     where: { productId_warehouseId: { productId: monitor.id, warehouseId: east.id } },
-    update: {},
+    update: {
+      totalUnits: 8,
+      reservedUnits: 0
+    },
     create: {
       productId: monitor.id,
       warehouseId: east.id,
